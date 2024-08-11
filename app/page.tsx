@@ -43,6 +43,8 @@ const Page = () => {
   };
 
   const handleStartClick = () => {
+    
+
     if (!psalmData || !psalmData[selectedPsalm]) {
       console.error('Psalm data is not available.');
       return;
@@ -56,7 +58,7 @@ const Page = () => {
     const words = text.split(' ');
 
     // Filter out numbers from words
-    const filteredWords = words.filter(word => isNaN(Number(word)));
+    const filteredWords = words.filter((word: any) => isNaN(Number(word)));
 
     // Determine the number of lines and selected indices
     const numberOfLines = lines.length;
@@ -69,35 +71,37 @@ const Page = () => {
     }
 
     // Replace selected words with input fields
-    const processed = words.map((word: string, index: number) => {
-      const key = `input-${index}`;
-      if (selectedIndices.has(filteredWords.indexOf(word))) {
-        return (
-          <span key={key} className="inline-flex items-center">
-            <input
-              key={key}
-              ref={(el) => {
-                if (el) {
-                  inputRefs.current.set(key, el); // Use unique key
-                }
-              }}
-              type="text"
-              onFocus={() => handleFocus(key)} // Handle focus event
-              onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
-              className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
-              style={{ width: `${word.length * 15}px` }} // Adjust width based on word length
-              placeholder=" " // Placeholder text
-            />
-            {index < words.length - 1 ? ' ' : ''}
-          </span>
-        );
-      }
-      return (
-        <span key={key} className="inline">
-          {word} {index < words.length - 1 ? ' ' : ''}
-        </span>
-      );
-    });
+    const inputslistindeces = []
+   const processed = words.map((word: string, index: number) => {
+  const key = `input-${index}`;
+  if (selectedIndices.has(filteredWords.indexOf(word))) {
+    inputslistindeces.push(index)
+    return (
+      <span  className="inline-flex items-center">
+        <input 
+          ref={(el) => {
+            if (el) {
+              inputRefs.current.set(key, el); // Use unique key
+            }
+          }}
+          type="text"
+          onFocus={() => handleFocus(key)} // Handle focus event
+          onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
+          className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
+          style={{ width: `${word.length * 15}px` }} // Adjust width based on word length
+          placeholder={`${index}`} // Set placeholder as the current index
+        />
+        {index < words.length - 1 ? ' ' : ''}
+      </span>
+    );
+  }
+  return (
+    <span  className="inline">
+      {word} {index < words.length - 1 ? ' ' : ''}
+    </span>
+  );
+});
+
 
     setProcessedText(processed);
     setShowQuestionnaire(true);
@@ -113,7 +117,7 @@ const Page = () => {
     }
   };
 
-  const handleKeyDown = (key: string, event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (key: any, event: React.KeyboardEvent<HTMLInputElement>) => {
     const ctrlPressed = event.ctrlKey;
 
     if (event.key === 'Enter') {
