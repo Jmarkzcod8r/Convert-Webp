@@ -15,7 +15,7 @@ const About = () => {
         <li><strong>Spacebar:</strong> Moves the focus to the next input field.</li>
         <li><strong>Ctrl + Spacebar:</strong> Moves the focus to the previous input field.</li>
         <li><strong>Ctrl + Enter:</strong> Clears the current input field.</li>
-        <li><strong>Ctrl + Shift + last input focus</strong> Submits the form.</li>
+        <li><strong>Spacebar + last input focus</strong> Submits the form.</li>
         <li><strong>Ctrl + Shift + Spacebar:</strong> Submits the form.</li>
       </ul>
 
