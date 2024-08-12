@@ -18,7 +18,7 @@ const Page = () => {
 
   useEffect(() => {
     // Populate dropdown options
-    const options = Array.from({ length: 150 }, (_, i) => i + 1);
+    const options = Array.from({ length: 50 }, (_, i) => i + 1);
     setNumbers(options);
 
     // Fetch psalms data
@@ -30,6 +30,8 @@ const Page = () => {
         }
         const data = await response.json();
         setPsalmData(data);
+        console.log(data)
+        
       } catch (error) {
         console.error('Failed to fetch psalm data:', error);
       }
@@ -40,11 +42,17 @@ const Page = () => {
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPsalm(Number(event.target.value));
+
+    // Reset states when a new Psalm is selected
+    inputRefs.current.clear(); // Clear the ref map
+    setPsalmText(psalmData[Number(event.target.value)]?.text || '');
+    setProcessedText([]);
+    setShowQuestionnaire(false);
+    setShowResults(false);
+    setScore(0);
   };
 
   const handleStartClick = () => {
-    
-
     if (!psalmData || !psalmData[selectedPsalm]) {
       console.error('Psalm data is not available.');
       return;
@@ -71,37 +79,36 @@ const Page = () => {
     }
 
     // Replace selected words with input fields
-    const inputslistindeces = []
-   const processed = words.map((word: string, index: number) => {
-  const key = `input-${index}`;
-  if (selectedIndices.has(filteredWords.indexOf(word))) {
-    inputslistindeces.push(index)
-    return (
-      <span  className="inline-flex items-center">
-        <input 
-          ref={(el) => {
-            if (el) {
-              inputRefs.current.set(key, el); // Use unique key
-            }
-          }}
-          type="text"
-          onFocus={() => handleFocus(key)} // Handle focus event
-          onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
-          className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
-          style={{ width: `${word.length * 15}px` }} // Adjust width based on word length
-          placeholder={`${index}`} // Set placeholder as the current index
-        />
-        {index < words.length - 1 ? ' ' : ''}
-      </span>
-    );
-  }
-  return (
-    <span  className="inline">
-      {word} {index < words.length - 1 ? ' ' : ''}
-    </span>
-  );
-});
-
+    const inputslistindeces = [];
+    const processed = words.map((word: string, index: number) => {
+      const key = `input-${index}`;
+      if (selectedIndices.has(filteredWords.indexOf(word))) {
+        inputslistindeces.push(index);
+        return (
+          <span key={index} className="inline-flex items-center">
+            <input
+              ref={(el) => {
+                if (el) {
+                  inputRefs.current.set(key, el); // Use unique key
+                }
+              }}
+              type="text"
+              onFocus={() => handleFocus(key)} // Handle focus event
+              onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
+              className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
+              style={{ width: `${word.length * 15}px` }} // Adjust width based on word length
+              placeholder={`${index}`} // Set placeholder as the current index
+            />
+            {index < words.length - 1 ? ' ' : ''}
+          </span>
+        );
+      }
+      return (
+        <span key={index} className="inline">
+          {word} {index < words.length - 1 ? ' ' : ''}
+        </span>
+      );
+    });
 
     setProcessedText(processed);
     setShowQuestionnaire(true);
@@ -119,10 +126,11 @@ const Page = () => {
 
   const handleKeyDown = (key: any, event: React.KeyboardEvent<HTMLInputElement>) => {
     const ctrlPressed = event.ctrlKey;
-
+    const shiftPressed = event.shiftKey;
+  
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default behavior
-
+  
       if (ctrlPressed) {
         // Clear the input field
         const currentInput = inputRefs.current.get(key);
@@ -141,35 +149,44 @@ const Page = () => {
       }
     } else if (event.key === ' ') {
       event.preventDefault(); // Prevent default behavior
-
-      const keys = Array.from(inputRefs.current.keys());
-      const index = keys.indexOf(key);
-
-      if (index === keys.length - 1) {
-        // If the space bar is pressed on the last input, trigger the submit button
+  
+      if (ctrlPressed && shiftPressed) {
+        // Trigger the submit button if Ctrl + Shift + Spacebar is pressed
         const submitButton = document.getElementById('submit-button');
         if (submitButton) {
           (submitButton as HTMLButtonElement).click();
         }
       } else {
+        const keys = Array.from(inputRefs.current.keys());
+        const index = keys.indexOf(key);
+  
         if (ctrlPressed) {
-          // Move focus to the previous input
+          // Move focus to the previous input if Ctrl is pressed
           const prevKey = keys[index - 1];
           const prevInput = prevKey ? inputRefs.current.get(prevKey) : null;
           if (prevInput) {
             prevInput.focus();
           }
         } else {
-          // Move focus to the next input
-          const nextKey = keys[index + 1];
-          const nextInput = nextKey ? inputRefs.current.get(nextKey) : null;
-          if (nextInput) {
-            nextInput.focus();
+          if (index === keys.length - 1) {
+            // If the space bar is pressed on the last input, trigger the submit button
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+              (submitButton as HTMLButtonElement).click();
+            }
+          } else {
+            // Move focus to the next input if Ctrl is not pressed
+            const nextKey = keys[index + 1];
+            const nextInput = nextKey ? inputRefs.current.get(nextKey) : null;
+            if (nextInput) {
+              nextInput.focus();
+            }
           }
         }
       }
     }
   };
+  
 
   const handleFocus = (key: string) => {
     const input = inputRefs.current.get(key);
@@ -210,19 +227,18 @@ const Page = () => {
   const handleCloseResults = () => {
     setShowResults(false);
   };
-
   return (
     <div className="min-h-screen flex">
       <nav className="bg-blue-500 p-4 fixed top-0 left-0 w-full z-50">
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-white text-2xl font-bold">
-            <a href="/">Psalmsster</a>
+            <a href="/">Psalmster</a> <span className='text-xs'>ver. 1.0</span>
           </div>
-          <div className="hidden md:flex space-x-4">
+          {/* <div className="hidden md:flex space-x-4">
             <a href="/" className="text-white hover:text-gray-200">Home</a>
             <a href="/leaderboard" className="text-white hover:text-gray-200">Leaderboard</a>
             <a href="/about" className="text-white hover:text-gray-200">About</a>
-          </div>
+          </div> */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)} // Toggling the menu
@@ -273,11 +289,17 @@ const Page = () => {
             Start
           </button>
 
+          
+
+          {psalmData && !showQuestionnaire && (
+            <div className='mt-8 text-black'><h4>{psalmText}</h4></div>
+          ) }
+
           {psalmData && showQuestionnaire && (
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4 text-center">
+              {/* <h2 className="text-2xl font-bold mb-4 text-center">
                 {psalmData[selectedPsalm]?.title || 'Select a Psalm'}
-              </h2>
+              </h2> */}
               <div className="text-black">{processedText}</div>
               <button
                 id="submit-button"
@@ -287,7 +309,9 @@ const Page = () => {
                 Submit
               </button>
             </div>
-          )}
+          ) }
+
+          
         </div>
       </div>
 
@@ -307,6 +331,8 @@ const Page = () => {
           </div>
         </div>
       )}
+
+     
     </div>
   );
 };
