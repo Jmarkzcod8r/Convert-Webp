@@ -96,7 +96,7 @@ const Page = () => {
               onFocus={() => handleFocus(key)} // Handle focus event
               onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
               className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
-              style={{ width: `${word.length * 16}px` }} // Adjust width based on word length
+              style={{ width: `${word.length * 18}px` }} // Adjust width based on word length
               placeholder={` ${index}`} // Set placeholder as the current index
             />
             {index < words.length - 1 ? ' ' : ''}
