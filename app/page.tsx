@@ -13,6 +13,7 @@ const Page = () => {
   const [score, setScore] = useState<number>(0);
   const [startTime, setStartTime] = useState<number>(0);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [correctAnswers, setCorrectAnswers] = useState<Map<number, boolean>>(new Map());
 
   const inputRefs = useRef<Map<string, HTMLInputElement | null>>(new Map());
 
@@ -50,6 +51,7 @@ const Page = () => {
     setShowQuestionnaire(false);
     setShowResults(false);
     setScore(0);
+    setCorrectAnswers(new Map()); // Reset correct answers
   };
 
   const handleStartClick = () => {
@@ -97,8 +99,8 @@ const Page = () => {
               onFocus={() => handleFocus(key)} // Handle focus event
               onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
               className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
-              style={{ width: `${word.length * 18}px` }} // Adjust width based on word length
-              placeholder={` ${index}`} // Set placeholder as the current index
+              style={{ width: `${word.length * 18}px`, backgroundColor: 'white' }} // Set initial background color to white
+              placeholder={` `} // Set placeholder as the current index
             />
             {index < words.length - 1 ? ' ' : ''}
           </span>
@@ -214,13 +216,23 @@ const Page = () => {
     // Calculate the score
     let score = 0;
     const words = psalmText.split(' ');
+    const newCorrectAnswers = new Map<number, boolean>();
+
     inputRefs.current.forEach((input, key) => {
       const index = parseInt(key.split('-')[1], 10);
-      if (input && input.value.trim() === words[index]) {
-        score++;
+      if (input) {
+        const isCorrect = input.value.trim() === words[index];
+        newCorrectAnswers.set(index, isCorrect);
+        if (isCorrect) {
+          input.style.backgroundColor = 'green'; // Turn correct inputs green
+          score++;
+        } else {
+          input.style.backgroundColor = 'red'; // Turn incorrect inputs red
+        }
       }
     });
 
+    setCorrectAnswers(newCorrectAnswers);
     setScore(score);
     setShowResults(true);
   };
@@ -228,6 +240,7 @@ const Page = () => {
   const handleCloseResults = () => {
     setShowResults(false);
   };
+
   return (
     <div className="min-h-screen flex">
       <nav className="bg-blue-500 p-4 fixed top-0 left-0 w-full z-50">
