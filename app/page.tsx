@@ -31,8 +31,7 @@ const Page = () => {
         }
         const data = await response.json();
         setPsalmData(data);
-        console.log(data)
-        
+        console.log(data);
       } catch (error) {
         console.error('Failed to fetch psalm data:', error);
       }
@@ -55,7 +54,21 @@ const Page = () => {
   };
 
   const handleStartClick = () => {
+    
+    setCorrectAnswers(new Map<number, boolean>());
+    console.log(inputRefs)
+    inputRefs.current.forEach((input, key) => {
+     
+      if (input) {
+        
+          input.style.backgroundColor = 'white'; // Turn incorrect inputs red
+      
+      }
+    });
     inputRefs.current.clear();
+
+  
+
     if (!psalmData || !psalmData[selectedPsalm]) {
       console.error('Psalm data is not available.');
       return;
@@ -82,11 +95,9 @@ const Page = () => {
     }
 
     // Replace selected words with input fields
-    const inputslistindeces = [];
     const processed = words.map((word: string, index: number) => {
       const key = `input-${index}`;
       if (selectedIndices.has(filteredWords.indexOf(word))) {
-        inputslistindeces.push(index);
         return (
           <span key={index} className="inline-flex items-center">
             <input
@@ -117,6 +128,13 @@ const Page = () => {
     setShowQuestionnaire(true);
     setStartTime(Date.now()); // Record start time
 
+    // Reset background color of all input fields to white
+    inputRefs.current.forEach((input) => {
+      if (input) {
+        input.style.backgroundColor = 'white';
+      }
+    });
+
     // Focus the first input field
     if (inputRefs.current.size > 0) {
       const firstKey = `input-0`;
@@ -130,10 +148,10 @@ const Page = () => {
   const handleKeyDown = (key: any, event: React.KeyboardEvent<HTMLInputElement>) => {
     const ctrlPressed = event.ctrlKey;
     const shiftPressed = event.shiftKey;
-  
+
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default behavior
-  
+
       if (ctrlPressed) {
         // Clear the input field
         const currentInput = inputRefs.current.get(key);
@@ -152,7 +170,7 @@ const Page = () => {
       }
     } else if (event.key === ' ') {
       event.preventDefault(); // Prevent default behavior
-  
+
       if (ctrlPressed && shiftPressed) {
         // Trigger the submit button if Ctrl + Shift + Spacebar is pressed
         const submitButton = document.getElementById('submit-button');
@@ -162,7 +180,7 @@ const Page = () => {
       } else {
         const keys = Array.from(inputRefs.current.keys());
         const index = keys.indexOf(key);
-  
+
         if (ctrlPressed) {
           // Move focus to the previous input if Ctrl is pressed
           const prevKey = keys[index - 1];
@@ -189,7 +207,6 @@ const Page = () => {
       }
     }
   };
-  
 
   const handleFocus = (key: string) => {
     const input = inputRefs.current.get(key);
@@ -239,6 +256,7 @@ const Page = () => {
 
   const handleCloseResults = () => {
     setShowResults(false);
+    setCorrectAnswers(new Map<number, boolean>());
   };
 
   return (
@@ -249,8 +267,6 @@ const Page = () => {
             <a href="/">Psalmster</a> <span className='text-xs'>ver. 1.0</span>
           </div>
           <div className="hidden md:flex space-x-4">
-            {/* <a href="/" className="text-white hover:text-gray-200">Home</a> */}
-            {/* <a href="/leaderboard" className="text-white hover:text-gray-200">Leaderboard</a> */}
             <a href="/about" className="text-white hover:text-gray-200">About</a>
           </div>
           <div className="md:hidden flex items-center">
@@ -271,8 +287,6 @@ const Page = () => {
           </div>
         </div>
         <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} mt-2`}>
-          {/* <a href="/" className="block py-2 px-4 text-white hover:bg-blue-700">Home</a> */}
-          {/* <a href="/leaderboard" className="block py-2 px-4 text-white hover:bg-blue-700">Leaderboard</a> */}
           <a href="/about" className="block py-2 px-4 text-white hover:bg-blue-700">About</a>
         </div>
       </nav>
@@ -303,17 +317,12 @@ const Page = () => {
             Start
           </button>
 
-          
-
           {psalmData && !showQuestionnaire && (
             <div className='mt-8 text-black'><h4>{psalmText}</h4></div>
-          ) }
+          )}
 
           {psalmData && showQuestionnaire && (
             <div className="mt-8">
-              {/* <h2 className="text-2xl font-bold mb-4 text-center">
-                {psalmData[selectedPsalm]?.title || 'Select a Psalm'}
-              </h2> */}
               <div className="text-black">{processedText}</div>
               <button
                 id="submit-button"
@@ -323,9 +332,7 @@ const Page = () => {
                 Submit
               </button>
             </div>
-          ) }
-
-          
+          )}
         </div>
       </div>
 
@@ -345,8 +352,6 @@ const Page = () => {
           </div>
         </div>
       )}
-
-     
     </div>
   );
 };
