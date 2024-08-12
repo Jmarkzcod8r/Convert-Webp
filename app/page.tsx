@@ -53,6 +53,7 @@ const Page = () => {
   };
 
   const handleStartClick = () => {
+    inputRefs.current.clear();
     if (!psalmData || !psalmData[selectedPsalm]) {
       console.error('Psalm data is not available.');
       return;
