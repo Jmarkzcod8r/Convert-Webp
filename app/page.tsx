@@ -96,8 +96,8 @@ const Page = () => {
               onFocus={() => handleFocus(key)} // Handle focus event
               onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
               className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
-              style={{ width: `${word.length * 15}px` }} // Adjust width based on word length
-              placeholder={`${index}`} // Set placeholder as the current index
+              style={{ width: `${word.length * 16}px` }} // Adjust width based on word length
+              placeholder={` ${index}`} // Set placeholder as the current index
             />
             {index < words.length - 1 ? ' ' : ''}
           </span>
@@ -234,11 +234,11 @@ const Page = () => {
           <div className="text-white text-2xl font-bold">
             <a href="/">Psalmster</a> <span className='text-xs'>ver. 1.0</span>
           </div>
-          {/* <div className="hidden md:flex space-x-4">
-            <a href="/" className="text-white hover:text-gray-200">Home</a>
-            <a href="/leaderboard" className="text-white hover:text-gray-200">Leaderboard</a>
+          <div className="hidden md:flex space-x-4">
+            {/* <a href="/" className="text-white hover:text-gray-200">Home</a> */}
+            {/* <a href="/leaderboard" className="text-white hover:text-gray-200">Leaderboard</a> */}
             <a href="/about" className="text-white hover:text-gray-200">About</a>
-          </div> */}
+          </div>
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)} // Toggling the menu
@@ -257,8 +257,8 @@ const Page = () => {
           </div>
         </div>
         <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} mt-2`}>
-          <a href="/" className="block py-2 px-4 text-white hover:bg-blue-700">Home</a>
-          <a href="/leaderboard" className="block py-2 px-4 text-white hover:bg-blue-700">Leaderboard</a>
+          {/* <a href="/" className="block py-2 px-4 text-white hover:bg-blue-700">Home</a> */}
+          {/* <a href="/leaderboard" className="block py-2 px-4 text-white hover:bg-blue-700">Leaderboard</a> */}
           <a href="/about" className="block py-2 px-4 text-white hover:bg-blue-700">About</a>
         </div>
       </nav>
