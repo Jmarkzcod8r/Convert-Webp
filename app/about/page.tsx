@@ -2,8 +2,8 @@ import React from 'react';
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-blue-400 mx-auto p-8  justify-center flex">
-        <div className='w-[600px] text-black bg-green-300 p-4 rounded-md'>
+    <div className="min-h-screen bg-slate-100 mx-auto p-8  justify-center flex">
+        <div className='w-[600px] text-black bg-blue-300 p-4 rounded-md'>
       <h1 className="text-3xl font-bold mb-4">About This Site</h1>
       <span className="mb-6">
         This website is designed to highlight the beauty and depth of the Psalms, making them accessible for everyone to appreciate more deeply. Whether you&rsquo;re reading for inspiration, comfort, or reflection, our goal is to provide an easy-to-use platform that allows you to explore the Psalms with ease.
