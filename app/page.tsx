@@ -54,46 +54,48 @@ const Page = () => {
   };
 
   const handleStartClick = () => {
-    
-    setCorrectAnswers(new Map<number, boolean>());
-    console.log(inputRefs)
+    setScore(0);
+    // inputRefs.current.clear();
+    console.log('inputRefs:', inputRefs)
+    setCorrectAnswers(new Map<number, boolean>(
+      Array.from(correctAnswers.keys()).map((key) => [key, false])
+    ));
+  
+    // Clear previous input values and reset colors
     inputRefs.current.forEach((input, key) => {
-     
       if (input) {
-        
-          input.style.backgroundColor = 'white'; // Turn incorrect inputs red
-      
+        input.value = ''; // Clear the input value
+        input.style.backgroundColor = 'white'; // Reset the background color to white
       }
     });
     inputRefs.current.clear();
-
+    
   
-
     if (!psalmData || !psalmData[selectedPsalm]) {
       console.error('Psalm data is not available.');
       return;
     }
-
+  
     const text = psalmData[selectedPsalm]?.text || '';
     setPsalmText(text);
-
+  
     // Split the text into lines and words
     const lines = text.split('\n');
     const words = text.split(' ');
-
+  
     // Filter out numbers from words
     const filteredWords = words.filter((word: any) => isNaN(Number(word)));
-
+  
     // Determine the number of lines and selected indices
     const numberOfLines = lines.length;
     const selectedIndices = new Set<number>();
     const numSelections = Math.min(numberOfLines, filteredWords.length); // Ensure we don't select more indices than available words
-
+  
     while (selectedIndices.size < numSelections) {
       const randomIndex = Math.floor(Math.random() * filteredWords.length);
       selectedIndices.add(randomIndex);
     }
-
+  
     // Replace selected words with input fields
     const processed = words.map((word: string, index: number) => {
       const key = `input-${index}`;
@@ -111,7 +113,7 @@ const Page = () => {
               onKeyDown={(e) => handleKeyDown(key, e)} // Pass the unique key
               className="border border-gray-300 rounded-lg p-1 mr-1 text-center"
               style={{ width: `${word.length * 18}px`, backgroundColor: 'white' }} // Set initial background color to white
-              placeholder={` `} // Set placeholder as the current index
+              placeholder={`${index}`} // Set placeholder as the current index
             />
             {index < words.length - 1 ? ' ' : ''}
           </span>
@@ -123,18 +125,39 @@ const Page = () => {
         </span>
       );
     });
-
+    
+    // Function to validate if all inputs are cleared and have white background
+    const validateInputs = () => {
+      let allCleared = true;
+    
+      inputRefs.current.forEach((input) => {
+        if (input && (input.value !== '' || input.style.backgroundColor !== 'white')) {
+          allCleared = false;
+        }
+      });
+    
+      return allCleared;
+    };
+    
+    // Function to reset inputs if validation fails
+    const resetInputsIfNecessary = () => {
+      if (!validateInputs()) {
+        inputRefs.current.forEach((input) => {
+          if (input) {
+            input.value = ''; // Clear the input value
+            input.style.backgroundColor = 'white'; // Reset background color to white
+          }
+        });
+      }
+    };
+    
+    // Run the reset check
+    resetInputsIfNecessary();
+  
     setProcessedText(processed);
     setShowQuestionnaire(true);
     setStartTime(Date.now()); // Record start time
-
-    // Reset background color of all input fields to white
-    inputRefs.current.forEach((input) => {
-      if (input) {
-        input.style.backgroundColor = 'white';
-      }
-    });
-
+  
     // Focus the first input field
     if (inputRefs.current.size > 0) {
       const firstKey = `input-0`;
@@ -144,6 +167,7 @@ const Page = () => {
       }
     }
   };
+  
 
   const handleKeyDown = (key: any, event: React.KeyboardEvent<HTMLInputElement>) => {
     const ctrlPressed = event.ctrlKey;
@@ -256,8 +280,24 @@ const Page = () => {
 
   const handleCloseResults = () => {
     setShowResults(false);
-    setCorrectAnswers(new Map<number, boolean>());
+  
+    // Convert all entries in the Map to `false`
+    setCorrectAnswers(new Map<number, boolean>(
+      Array.from(correctAnswers.keys()).map((key) => [key, false])
+    ));
+    // Clear previous input values and reset colors
+    // inputRefs.current.forEach((input, key) => {
+    //   if (input) {
+    //     input.value = ''; // Clear the input value
+    //     input.style.backgroundColor = 'white'; // Reset the background color to white
+    //   }
+    // });
+    
+    // inputRefs.current.clear();
+    console.log('inputrefs:', inputRefs)
   };
+  
+  
 
   return (
     <div className="min-h-screen flex">
