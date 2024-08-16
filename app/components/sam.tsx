@@ -1,11 +1,11 @@
 import React from 'react';
 import './Loader.css'; // Import custom CSS for specific animations
 
-const Loader = () => {
+const Loader = ({ w = '2em', h = '2em' }) => {
   return (
-    <div className="w-full flex items-center justify-center h-auto ">
+    <div className="w-full flex items-center justify-center h-auto">
       <svg
-        className="w-[2em] h-[2em] "  // Reduced by 40%
+        style={{ width: w, height: h }} // Use inline styles for width and height
         xmlns="http://www.w3.org/2000/svg"
         id="Layer_1"
         data-name="Layer 1"

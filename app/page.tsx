@@ -430,7 +430,11 @@ const Page = () => {
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-white text-2xl font-bold flex flex-row items-center gap-2">
             <a href="/">Psalmster</a> <span className='text-xs'>ver. 1.0.1</span>
-            <span className='h-auto '><Loader/></span>
+            <span className='h-auto'>
+              <a href='/sam_the_hamster' target='_blank' rel='noopener noreferrer'>
+                <Loader />
+              </a>
+            </span>
           </div>
           <div className="hidden md:flex space-x-4">
             <a href="/about" className="text-white hover:text-gray-200">About</a>
