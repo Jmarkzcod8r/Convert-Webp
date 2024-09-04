@@ -2,58 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from './components/sam';
-
-interface TooltipProps {
-  inputRef: React.RefObject<HTMLInputElement>;
-  text: string;
-}
-
-const Tooltip: React.FC<TooltipProps> = ({ inputRef, text }) => {
-  const [show, setShow] = useState(false);
-  const [position, setPosition] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
-  
-  useEffect(() => {
-    const inputElement = inputRef.current;
-    if (inputElement) {
-      const handleMouseEnter = () => {
-        const rect = inputElement.getBoundingClientRect();
-        setPosition({
-          left: rect.left + window.scrollX + rect.width / 2,
-          top: rect.top + window.scrollY - 50 // 50px above the input
-        });
-        setShow(true);
-      };
-
-      const handleMouseLeave = () => {
-        setShow(false);
-      };
-
-      inputElement.addEventListener('mouseenter', handleMouseEnter);
-      inputElement.addEventListener('mouseleave', handleMouseLeave);
-
-      return () => {
-        inputElement.removeEventListener('mouseenter', handleMouseEnter);
-        inputElement.removeEventListener('mouseleave', handleMouseLeave);
-      };
-    }
-  }, [inputRef]);
-
-  return (
-    <>
-      {show && (
-        <div
-          className="absolute bg-black text-white text-sm rounded-lg p-2 shadow-lg z-10"
-          style={{ left: `${position.left}px`, top: `${position.top}px`, transform: 'translateX(-50%)' }}
-        >
-          {text}
-        </div>
-      )}
-    </>
-  );
-};
-
-
-
+import Fireworks from './components/fireworks';
 
 
 const Page = () => {
@@ -68,6 +17,10 @@ const Page = () => {
   const [startTime, setStartTime] = useState<number>(0);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [correctAnswers, setCorrectAnswers] = useState<Map<number, boolean>>(new Map());
+  const [showFireworks, setShowFireworks] = useState<boolean>(false); // New state for fireworks visibility
+  const [showHints, setShowHints] = useState<boolean>(false); // State for toggling hints
+
+
 
   const inputRefs = useRef<Map<string, HTMLInputElement | null>>(new Map());
 
@@ -128,6 +81,7 @@ const Page = () => {
   const handleStartClick = () => {
     setScore(0);
     // inputRefs.current.clear();
+    setShowFireworks(false); // Hide fireworks on start
     console.log('inputRefs:', inputRefs)
     setCorrectAnswers(new Map<number, boolean>(
       Array.from(correctAnswers.keys()).map((key) => [key, false])
@@ -328,6 +282,17 @@ const Page = () => {
   };
 
 
+  const toggleHints = () => {
+    setShowHints(!showHints);
+
+    inputRefs.current.forEach((input, key) => {
+      const index = parseInt(key.split('-')[1], 10);
+      if (input) {
+        input.placeholder = showHints ? ' ' : psalmText.split(' ')[index];
+      }
+    });
+  };
+
   const handleSubmit = () => {
     if (!psalmData || !psalmText) return;
 
@@ -399,6 +364,8 @@ const Page = () => {
     setCorrectAnswers(newCorrectAnswers);
     setScore(score);
     setShowResults(true);
+    setShowFireworks(score === inputRefs.current.size);
+  
   };
 
 
@@ -424,8 +391,14 @@ const Page = () => {
   
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-y-auto">
+       {showFireworks && (
+        <div className="">
+           <Fireworks />
+        </div>
+      )}
       {/* <Loader/> */}
+      {/* <Fireworks /> */}
       <nav className="bg-blue-500 p-4 fixed top-0 left-0 w-full z-50">
         <div className="container mx-auto flex items-center justify-between">
           <div className="text-white text-2xl font-bold flex flex-row items-center gap-2">
@@ -436,7 +409,16 @@ const Page = () => {
               </a>
             </span>
           </div>
-          <div className="hidden md:flex space-x-4">
+         
+          
+         
+          <div className="hidden md:flex space-x-4  items-center">
+          <button
+              onClick={toggleHints}
+              className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
+            >
+              {showHints ? 'Hide Hints' : 'Show Hints'}
+            </button>
             <a href="/about" className="text-white hover:text-gray-200">About</a>
           </div>
           <div className="md:hidden flex items-center">
@@ -454,14 +436,21 @@ const Page = () => {
                 </svg>
               )}
             </button>
+            
           </div>
         </div>
         <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} mt-2`}>
           <a href="/about" className="block py-2 px-4 text-white hover:bg-blue-700">About</a>
+          <button
+              onClick={toggleHints}
+              className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
+            >
+              {showHints ? 'Hide Hints' : 'Show Hints'}
+            </button>
         </div>
       </nav>
 
-      <div className="pt-16 flex flex-grow bg-gray-100 p-4">
+      <div className="pt-16 flex flex-grow bg-gray-100 p-4 mt-[2em]">
         <div className="w-full max-w-md mx-auto p-4 bg-white border border-gray-300 rounded-lg shadow-md">
           <label htmlFor="psalm-number" className="block text-lg font-semibold mb-2 text-black text-center">
             Psalm
@@ -520,6 +509,7 @@ const Page = () => {
               Close
             </button>
           </div>
+        
         </div>
       )}
     </div>
